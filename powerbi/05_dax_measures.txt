@@ -1,0 +1,89 @@
+=====================================================================
+STEP 5 - DAX for the Sydney short-term rental model
+Table names assumed (rename them exactly like this in Power Query):
+  Listing, Neighbourhood, RoomType, HostType, Availability, ReviewsMonthly, DimDate
+How to add each item: Home > Modeling > New table (for DimDate)
+                      or right-click the table > New measure (for measures).
+Paste ONE item at a time, including its first line (the name).
+=====================================================================
+
+
+---------------------------------------------------------------------
+A) DATE TABLE (create with: Modeling > New table)
+---------------------------------------------------------------------
+DimDate =
+ADDCOLUMNS (
+    CALENDAR ( DATE ( 2009, 12, 1 ), DATE ( 2027, 9, 30 ) ),
+    "Year", YEAR ( [Date] ),
+    "Month No", MONTH ( [Date] ),
+    "Month", FORMAT ( [Date], "mmm" ),
+    "Month Start", DATE ( YEAR ( [Date] ), MONTH ( [Date] ), 1 )
+)
+
+After creating it:
+  - Table tools > Mark as date table > choose the [Date] column.
+  - Select column [Month] > Column tools > Sort by column > [Month No].
+
+
+---------------------------------------------------------------------
+B) MEASURES ON THE Listing TABLE
+---------------------------------------------------------------------
+Listings = COUNTROWS ( Listing )
+
+Median Price = MEDIAN ( Listing[price_ok] )
+
+Avg Price = AVERAGE ( Listing[price_ok] )
+
+Avg Est Revenue = AVERAGE ( Listing[est_revenue_ok] )
+
+Avg Nights Booked = AVERAGE ( Listing[est_occupancy_nights_l365d] )
+
+Avg Rating = AVERAGE ( Listing[review_score_rating] )
+
+Professional Host Share % =
+DIVIDE (
+    CALCULATE ( COUNTROWS ( Listing ), Listing[host_type] = "Professional (6+)" ),
+    COUNTROWS ( Listing )
+)
+
+STRA Registered % =
+DIVIDE (
+    CALCULATE ( COUNTROWS ( Listing ), Listing[license_status] = "STRA registered" ),
+    COUNTROWS ( Listing )
+)
+
+
+---------------------------------------------------------------------
+C) MEASURES ON THE Availability TABLE
+---------------------------------------------------------------------
+Listing Days = SUM ( Availability[listing_days] )
+
+Unavailable Days = SUM ( Availability[unavailable_days] )
+
+Unavailability % = DIVIDE ( [Unavailable Days], [Listing Days] )
+
+
+---------------------------------------------------------------------
+D) MEASURES ON THE ReviewsMonthly TABLE
+---------------------------------------------------------------------
+Reviews = SUM ( ReviewsMonthly[reviews] )
+
+Reviews LY = CALCULATE ( [Reviews], SAMEPERIODLASTYEAR ( DimDate[Date] ) )
+
+Reviews YoY % = DIVIDE ( [Reviews] - [Reviews LY], [Reviews LY] )
+
+
+---------------------------------------------------------------------
+E) VALIDATION: put each measure in a Card visual, no filters.
+   Expected values:
+---------------------------------------------------------------------
+Listings                    20,833
+Median Price                330.67   (only listings with price_flag = OK)
+Avg Price                   406.48
+Avg Est Revenue             26,875
+Avg Nights Booked           66.0     (set decimals to 1)
+Avg Rating                  4.72
+Professional Host Share %   42.7%
+STRA Registered %           74.5%
+Unavailability %            52.1%
+Reviews                     829,163
