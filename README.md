@@ -120,6 +120,6 @@ Report totals were reconciled with SQL results at each step:
 
 **Chloe Nguyen**, Sydney NSW
 Power BI Data Analyst Associate · IBM Data Analyst Professional
-[LinkedIn](www.linkedin.com/in/chloe-nguyen-990856166) · [GitHub](https://github.com/ngochuyen27196)
+[LinkedIn](https://www.linkedin.com/in/chloe-nguyen-990856166) · [GitHub](https://github.com/ngochuyen27196)
 
 *Data: Inside Airbnb. This project is independent and is not affiliated with Airbnb.*
